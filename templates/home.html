@@ -1,17 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - Internship & Job Board{% endblock %}
+{% block title %}Home - Internship Hub{% endblock %}
 
 {% block content %}
-<div class="card">
-    <span class="badge">Project-Level Template</span>
-    <h2 style="margin-top: 0.75rem; margin-bottom: 0.5rem; color: #0f172a;">Welcome to the Campus Career & Internship Hub</h2>
-    <p style="color: #475569; line-height: 1.6; margin-bottom: 1.5rem;">
-        This project is built for the <strong>API &ndash; Application Programming for the Internet</strong> semester course.
-        It is configured with both project-level and app-level templates.
-    </p>
-    <a href="{% url 'job_list' %}" style="display: inline-block; background-color: #0284c7; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 500;">
-        Explore Job Listings &rarr;
-    </a>
-</div>
+<h2>Home Page (Project-Level Template)</h2>
+<p>Welcome to the Campus Career &amp; Internship Hub.</p>
+<p>This page demonstrates rendering using a project-level template located in the root <code>templates/</code> directory.</p>
+<p><a href="{% url 'job_list' %}">Go to Job Listings &rarr;</a></p>
 {% endblock %}

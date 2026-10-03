@@ -19,5 +19,5 @@ class JobViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'base.html')
         self.assertTemplateUsed(response, 'jobs/job_list.html')
-        self.assertContains(response, 'Available Internships & Job Openings')
+        self.assertContains(response, 'Available Internships and Job Openings')
         self.assertContains(response, 'Junior Python / Django Developer Intern')
