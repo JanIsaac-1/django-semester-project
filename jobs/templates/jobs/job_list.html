@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Listings - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="card">
+    <span class="badge">App-Level Template: jobs/templates/jobs/job_list.html</span>
+    <h2 style="margin-top: 0.75rem; margin-bottom: 0.5rem; color: #0f172a;">Available Internships & Job Openings</h2>
+    <p style="color: #64748b; margin-bottom: 1.5rem;">Below are sample listings loaded through the <code>jobs</code> app view.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for job in jobs %}
+        <div style="border: 1px solid #e2e8f0; border-radius: 6px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h3 style="font-size: 1.1rem; color: #1e293b;">{{ job.title }}</h3>
+                    <p style="color: #0284c7; font-weight: 500; font-size: 0.9rem;">{{ job.company }} &bull; {{ job.location }}</p>
+                </div>
+                <span style="background-color: #f1f5f9; color: #475569; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                    {{ job.job_type }}
+                </span>
+            </div>
+            <p style="margin-top: 0.75rem; color: #475569; font-size: 0.925rem; line-height: 1.5;">
+                {{ job.description }}
+            </p>
+        </div>
+        {% empty %}
+        <p>No job listings found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
