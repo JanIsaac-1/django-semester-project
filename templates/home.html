@@ -3,7 +3,16 @@
 {% block title %}Home - Internship Hub{% endblock %}
 
 {% block content %}
-<h2>Home Page</h2>
-<p>Welcome to the Campus Career &amp; Internship Hub.</p>
-<p><a href="{% url 'job_list' %}">Go to Job Listings &rarr;</a></p>
+<div class="box">
+    <h2 style="margin-top: 0;">Find Your Next Internship or Job</h2>
+    <p>Welcome to the Campus Career &amp; Internship Hub. Browse open student opportunities, post new listings, and keep track of your applications in one place.</p>
+    <p style="margin: 20px 0 0 0; display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{% url 'job_list' %}" class="btn">Browse Job Listings &rarr;</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'job_create' %}" class="btn-secondary">Post a Job</a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn-secondary">Create an Account</a>
+        {% endif %}
+    </p>
+</div>
 {% endblock %}

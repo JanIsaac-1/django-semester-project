@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="box form-box">
+    <h2 style="margin-top: 0;">Login</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+
+    <p style="margin: 16px 0 0 0;">Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a Job - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="box form-box">
+    <h2 style="margin-top: 0;">Post a New Job or Internship</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Post Job</button>
+    </form>
+
+    <p style="margin: 16px 0 0 0;"><a href="{% url 'job_list' %}">Cancel</a></p>
+</div>
+{% endblock %}

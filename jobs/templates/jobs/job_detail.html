@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }} - Internship Hub{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'job_list' %}" style="text-decoration: none;">&larr; Back to Job Listings</a></p>
+
+<div class="box">
+    <div class="item-top">
+        <h2 style="margin: 0;">{{ job.title }}</h2>
+        <span class="tag">{{ job.job_type }}</span>
+    </div>
+    <p class="meta">
+        <strong>{{ job.company }}</strong> &bull; {{ job.location }}
+    </p>
+    <p class="meta">Posted by {{ job.posted_by.username }} on {{ job.created_at|date:"M d, Y" }}</p>
+    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;">
+    <div>{{ job.description|linebreaks }}</div>
+</div>
+
+<div class="box">
+    <h3 style="margin-top: 0;">Apply for this Position</h3>
+    {% if user.is_authenticated %}
+        {% if existing_application %}
+            <p style="margin-bottom: 0;">
+                You applied for this job on {{ existing_application.applied_at|date:"M d, Y" }}.
+                Status: <span class="tag">{{ existing_application.status }}</span>
+            </p>
+        {% else %}
+            <form method="post" action="{% url 'apply_job' job.pk %}" style="max-width: 520px;">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit Application</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p style="margin-bottom: 0;"><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> or <a href="{% url 'register' %}">register</a> to apply for this position.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}My Applications - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>My Job Applications</h2>
+</div>
+
+<ul class="item-list">
+    {% for application in applications %}
+    <li class="box">
+        <div class="item-top">
+            <div>
+                <strong><a href="{% url 'job_detail' application.job.pk %}" style="text-decoration: none;">{{ application.job.title }}</a></strong>
+                <div class="meta" style="margin-bottom: 0;">
+                    {{ application.job.company }} &bull; Applied on {{ application.applied_at|date:"M d, Y" }}
+                </div>
+            </div>
+            <span class="tag">{{ application.status }}</span>
+        </div>
+    </li>
+    {% empty %}
+    <li class="box">You have not applied to any jobs yet. <a href="{% url 'job_list' %}">Browse jobs</a>.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
