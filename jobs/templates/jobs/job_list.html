@@ -4,40 +4,59 @@
 
 {% block content %}
 <div class="page-header">
-    <h2>Available Internships and Job Openings</h2>
+    <div>
+        <h2>Available Internships and Job Openings</h2>
+        <p class="meta" style="margin: 2px 0 0 0;">Browse open opportunities or filter by keyword, role type, and work mode.</p>
+    </div>
     {% if user.is_authenticated %}
     <a href="{% url 'job_create' %}" class="btn">+ Post a New Job</a>
     {% endif %}
 </div>
 
 <form method="get" action="{% url 'job_list' %}" class="box filter-bar">
-    <input type="text" name="q" value="{{ query }}" placeholder="Search title, company, or location...">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search title, company, skills, or location...">
     <select name="job_type">
         <option value="">All Job Types</option>
         {% for value, label in job_types %}
             <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
     </select>
+    <select name="work_mode">
+        <option value="">All Work Modes</option>
+        {% for value, label in work_modes %}
+            <option value="{{ value }}" {% if selected_mode == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
     <button type="submit">Filter</button>
-    {% if query or selected_type %}
+    {% if query or selected_type or selected_mode %}
         <a href="{% url 'job_list' %}" class="btn-secondary">Clear</a>
     {% endif %}
 </form>
 
 <ul class="item-list">
     {% for job in jobs %}
-    <li class="box">
+    <li class="box box-hover">
         <div class="item-top">
-            <h3 style="margin: 0;"><a href="{% url 'job_detail' job.pk %}" style="text-decoration: none;">{{ job.title }}</a></h3>
-            <span class="tag">{{ job.job_type }}</span>
+            <div class="job-title-group">
+                <span class="company-avatar">{{ job.company|slice:":1"|upper }}</span>
+                <div>
+                    <h3 style="margin: 0;"><a href="{% url 'job_detail' job.pk %}" style="text-decoration: none;">{{ job.title }}</a></h3>
+                    <p class="meta">
+                        <strong>{{ job.company }}</strong> &bull; {{ job.location }}
+                        {% if job.work_mode %}&bull; {{ job.work_mode }}{% endif %}
+                        {% if job.salary %}&bull; {{ job.salary }}{% endif %}
+                        {% if job.application_deadline %}&bull; Closes {{ job.application_deadline|date:"M d, Y" }}{% endif %}
+                    </p>
+                </div>
+            </div>
+            <span class="tag {% if job.job_type == 'Full-time' %}tag-fulltime{% elif job.job_type == 'Part-time' %}tag-parttime{% endif %}">{{ job.job_type }}</span>
         </div>
-        <p class="meta"><strong>{{ job.company }}</strong> &bull; {{ job.location }}</p>
-        <p style="margin-bottom: 0;">{{ job.description|truncatewords:30 }}</p>
+        <p style="margin: 8px 0 0 56px; color: #475569;">{{ job.description|truncatewords:30 }}</p>
     </li>
     {% empty %}
     <li class="box">
         No matching job listings found.
-        {% if query or selected_type %}
+        {% if query or selected_type or selected_mode %}
             <a href="{% url 'job_list' %}">Reset filters</a>.
         {% endif %}
     </li>
@@ -48,13 +67,13 @@
 <div class="pagination">
     <div>
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if selected_type %}&job_type={{ selected_type|urlencode }}{% endif %}" class="btn-secondary btn-small">&larr; Previous</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if selected_type %}&job_type={{ selected_type|urlencode }}{% endif %}{% if selected_mode %}&work_mode={{ selected_mode|urlencode }}{% endif %}" class="btn-secondary btn-small">&larr; Previous</a>
         {% endif %}
     </div>
     <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
     <div>
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if selected_type %}&job_type={{ selected_type|urlencode }}{% endif %}" class="btn-secondary btn-small">Next &rarr;</a>
+            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if selected_type %}&job_type={{ selected_type|urlencode }}{% endif %}{% if selected_mode %}&work_mode={{ selected_mode|urlencode }}{% endif %}" class="btn-secondary btn-small">Next &rarr;</a>
         {% endif %}
     </div>
 </div>

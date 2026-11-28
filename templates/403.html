@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Access Denied - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="box form-box" style="text-align: center;">
+    <span class="tag tag-rejected" style="margin-bottom: 12px;">403 Forbidden</span>
+    <h2 style="margin: 0 0 8px 0;">Access Denied</h2>
+    <p class="meta" style="margin-bottom: 20px;">You do not have permission to view or modify this resource.</p>
+    <div class="actions" style="justify-content: center;">
+        <a href="{% url 'home' %}" class="btn">Go Home</a>
+        <a href="{% url 'job_list' %}" class="btn-secondary">Browse Jobs</a>
+    </div>
+</div>
+{% endblock %}

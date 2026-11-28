@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="box form-box-wide">
+    <div class="item-top" style="margin-bottom: 18px;">
+        <div>
+            <h2 style="margin: 0 0 4px 0;">Account Profile</h2>
+            <p class="meta" style="margin: 0;">Update your contact details or manage your password.</p>
+        </div>
+        <a href="{% url 'password_change' %}" class="btn-secondary btn-small">Change Password</a>
+    </div>
+
+    <div class="detail-meta-grid" style="margin-bottom: 22px;">
+        <div>
+            <span class="detail-meta-label">Username</span>
+            <span class="detail-meta-value">{{ user.username }}</span>
+        </div>
+        <div>
+            <span class="detail-meta-label">Posted Jobs</span>
+            <span class="detail-meta-value">{{ posted_count }}</span>
+        </div>
+        <div>
+            <span class="detail-meta-label">Submitted Applications</span>
+            <span class="detail-meta-value">{{ application_count }}</span>
+        </div>
+        <div>
+            <span class="detail-meta-label">Date Joined</span>
+            <span class="detail-meta-value">{{ user.date_joined|date:"M d, Y" }}</span>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <ul class="errorlist">{{ form.non_field_errors }}</ul>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+        </div>
+
+        <div class="actions" style="margin-top: 8px;">
+            <button type="submit">Save Profile</button>
+            <a href="{% url 'job_list' %}" class="btn-secondary">Back to Jobs</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

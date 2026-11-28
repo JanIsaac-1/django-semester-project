@@ -4,25 +4,49 @@
 
 {% block content %}
 <div class="page-header">
-    <h2>My Posted Jobs</h2>
+    <div>
+        <h2>My Posted Jobs</h2>
+        <p class="meta" style="margin: 2px 0 0 0;">Manage your active job listings and review incoming applicants.</p>
+    </div>
     <a href="{% url 'job_create' %}" class="btn">+ Post a New Job</a>
 </div>
 
 <ul class="item-list">
     {% for job in jobs %}
-    <li class="box">
+    <li class="box box-hover">
         <div class="item-top">
-            <div>
-                <h3 style="margin: 0;"><a href="{% url 'job_detail' job.pk %}" style="text-decoration: none;">{{ job.title }}</a></h3>
-                <p class="meta" style="margin-bottom: 0;">
-                    <strong>{{ job.company }}</strong> &bull; {{ job.location }} &bull; Posted {{ job.created_at|date:"M d, Y" }}
-                </p>
+            <div class="job-title-group">
+                <span class="company-avatar">{{ job.company|slice:":1"|upper }}</span>
+                <div>
+                    <h3 style="margin: 0;"><a href="{% url 'job_detail' job.pk %}" style="text-decoration: none;">{{ job.title }}</a></h3>
+                    <p class="meta" style="margin-bottom: 0;">
+                        <strong>{{ job.company }}</strong> &bull; {{ job.location }}
+                        {% if job.work_mode %}&bull; {{ job.work_mode }}{% endif %}
+                        {% if job.salary %}&bull; {{ job.salary }}{% endif %}
+                        {% if job.application_deadline %}&bull; Deadline {{ job.application_deadline|date:"M d, Y" }}{% endif %}
+                    </p>
+                </div>
             </div>
-            <span class="tag">{{ job.application_count }} Applicant{{ job.application_count|pluralize }}</span>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                {% if job.is_active %}
+                    <span class="tag tag-accepted">Open</span>
+                {% else %}
+                    <span class="tag tag-rejected">Closed</span>
+                {% endif %}
+                <span class="tag">{{ job.application_count }} Applicant{{ job.application_count|pluralize }}</span>
+            </div>
         </div>
-        <div class="actions">
+        <div class="actions" style="margin-left: 56px;">
             <a href="{% url 'job_applicants' job.pk %}" class="btn btn-small">Manage Applicants</a>
             <a href="{% url 'job_update' job.pk %}" class="btn-secondary btn-small">Edit</a>
+            <form method="post" action="{% url 'toggle_job_status' job.pk %}" style="display: inline;">
+                {% csrf_token %}
+                {% if job.is_active %}
+                    <button type="submit" class="btn-secondary btn-small" style="background: #fff; color: #0f766e; border: 1px solid #cbd5e1;">Close</button>
+                {% else %}
+                    <button type="submit" class="btn btn-small">Reopen</button>
+                {% endif %}
+            </form>
             <a href="{% url 'job_delete' job.pk %}" class="btn-danger btn-small">Delete</a>
         </div>
     </li>

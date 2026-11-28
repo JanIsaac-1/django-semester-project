@@ -124,8 +124,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-# Authentication redirects
+# Authentication redirects & backends
+AUTHENTICATION_BACKENDS = [
+    'jobs.backends.UsernameOrEmailBackend',
+]
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'job_list'
 LOGOUT_REDIRECT_URL = 'home'

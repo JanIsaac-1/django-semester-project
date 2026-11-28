@@ -3,24 +3,68 @@
 {% block title %}{{ job.title }} - Internship Hub{% endblock %}
 
 {% block content %}
-<p><a href="{% url 'job_list' %}" style="text-decoration: none;">&larr; Back to Job Listings</a></p>
+<p style="margin-top: 0;"><a href="{% url 'job_list' %}" style="text-decoration: none; font-weight: 500;">&larr; Back to Job Listings</a></p>
 
 <div class="box">
     <div class="item-top">
-        <h2 style="margin: 0;">{{ job.title }}</h2>
-        <span class="tag">{{ job.job_type }}</span>
+        <div class="job-title-group">
+            <span class="company-avatar">{{ job.company|slice:":1"|upper }}</span>
+            <div>
+                <h2 style="margin: 0;">{{ job.title }}</h2>
+                <p class="meta" style="margin-bottom: 2px;"><strong>{{ job.company }}</strong> &bull; {{ job.location }}</p>
+                <p class="meta" style="margin: 0;">Posted by {{ job.posted_by.username }} on {{ job.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+            {% if not job.is_active %}
+                <span class="tag tag-rejected">Closed</span>
+            {% endif %}
+            <span class="tag {% if job.job_type == 'Full-time' %}tag-fulltime{% elif job.job_type == 'Part-time' %}tag-parttime{% endif %}">{{ job.job_type }}</span>
+        </div>
     </div>
-    <p class="meta">
-        <strong>{{ job.company }}</strong> &bull; {{ job.location }}
-    </p>
-    <p class="meta">Posted by {{ job.posted_by.username }} on {{ job.created_at|date:"M d, Y" }}</p>
-    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;">
-    <div>{{ job.description|linebreaks }}</div>
+
+    <div class="detail-meta-grid">
+        <div>
+            <span class="detail-meta-label">Work Mode</span>
+            <span class="detail-meta-value">{{ job.work_mode|default:"On-site" }}</span>
+        </div>
+        <div>
+            <span class="detail-meta-label">Salary / Stipend</span>
+            <span class="detail-meta-value">{{ job.salary|default:"Not specified" }}</span>
+        </div>
+        <div>
+            <span class="detail-meta-label">Deadline</span>
+            <span class="detail-meta-value">
+                {% if job.application_deadline %}{{ job.application_deadline|date:"M d, Y" }}{% else %}Rolling{% endif %}
+            </span>
+        </div>
+        <div>
+            <span class="detail-meta-label">Posted By</span>
+            <span class="detail-meta-value">{{ job.posted_by.username }}</span>
+        </div>
+    </div>
+
+    <h3 style="margin: 18px 0 8px 0;">Role Description</h3>
+    <div style="color: #334155;">{{ job.description|linebreaks }}</div>
+
+    {% if job.requirements %}
+    <h3 style="margin: 20px 0 8px 0;">Requirements &amp; Skills</h3>
+    <div style="color: #334155;">{{ job.requirements|linebreaks }}</div>
+    {% endif %}
 
     {% if is_owner %}
-    <div class="actions">
+    <div class="actions" style="padding-top: 8px; border-top: 1px solid #f1f5f9;">
         <a href="{% url 'job_applicants' job.pk %}" class="btn btn-small">View Applicants ({{ job.applications.count }})</a>
         <a href="{% url 'job_update' job.pk %}" class="btn-secondary btn-small">Edit Job</a>
+        <form method="post" action="{% url 'toggle_job_status' job.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            {% if job.is_active %}
+                <button type="submit" class="btn-secondary btn-small" style="background: #fff; color: #0f766e; border: 1px solid #cbd5e1;">Close Listing</button>
+            {% else %}
+                <button type="submit" class="btn btn-small">Reopen Listing</button>
+            {% endif %}
+        </form>
         <a href="{% url 'job_delete' job.pk %}" class="btn-danger btn-small">Delete Job</a>
     </div>
     {% endif %}
@@ -31,25 +75,36 @@
     <h3 style="margin-top: 0;">Apply for this Position</h3>
     {% if user.is_authenticated %}
         {% if existing_application %}
-            <p>
+            <p style="margin-bottom: 0;">
                 You applied for this job on {{ existing_application.applied_at|date:"M d, Y" }}.
-                Status: <span class="tag">{{ existing_application.status }}</span>
+                Status: <span class="tag {% if existing_application.status == 'Accepted' %}tag-accepted{% elif existing_application.status == 'Rejected' %}tag-rejected{% elif existing_application.status == 'Reviewed' %}tag-reviewed{% endif %}">{{ existing_application.status }}</span>
             </p>
+            {% if existing_application.cv %}
+            <p style="margin: 10px 0 0 0;">
+                <a href="{{ existing_application.cv.url }}" target="_blank" class="btn-secondary btn-small">View Uploaded CV</a>
+            </p>
+            {% endif %}
             {% if existing_application.status == 'Applied' %}
-            <form method="post" action="{% url 'withdraw_application' existing_application.pk %}" style="margin-top: 10px;">
+            <form method="post" action="{% url 'withdraw_application' existing_application.pk %}" style="margin-top: 14px;">
                 {% csrf_token %}
                 <button type="submit" class="btn-danger btn-small">Withdraw Application</button>
             </form>
             {% endif %}
+        {% elif not job.is_active %}
+            <p style="margin-bottom: 0;">This position is currently <strong>closed</strong> and no longer accepting new applications.</p>
         {% else %}
-            <form method="post" action="{% url 'apply_job' job.pk %}" style="max-width: 520px;">
+            <form method="post" action="{% url 'apply_job' job.pk %}" enctype="multipart/form-data" style="max-width: 540px;">
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit">Submit Application</button>
             </form>
         {% endif %}
     {% else %}
-        <p style="margin-bottom: 0;"><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> or <a href="{% url 'register' %}">register</a> to apply for this position.</p>
+        {% if not job.is_active %}
+            <p style="margin-bottom: 0;">This position is currently <strong>closed</strong> and no longer accepting new applications.</p>
+        {% else %}
+            <p style="margin-bottom: 0;"><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> or <a href="{% url 'register' %}">register</a> to apply for this position.</p>
+        {% endif %}
     {% endif %}
 </div>
 {% endif %}

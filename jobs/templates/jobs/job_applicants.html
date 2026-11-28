@@ -3,11 +3,14 @@
 {% block title %}Applicants for {{ job.title }} - Internship Hub{% endblock %}
 
 {% block content %}
-<p><a href="{% url 'my_posted_jobs' %}" style="text-decoration: none;">&larr; Back to My Posted Jobs</a></p>
+<p style="margin-top: 0;"><a href="{% url 'my_posted_jobs' %}" style="text-decoration: none; font-weight: 500;">&larr; Back to My Posted Jobs</a></p>
 
 <div class="page-header">
-    <h2>Applicants for {{ job.title }}</h2>
-    <span class="tag">{{ job.company }}</span>
+    <div>
+        <h2>Applicants for {{ job.title }}</h2>
+        <p class="meta" style="margin: 2px 0 0 0;">{{ job.company }} &bull; {{ job.location }}</p>
+    </div>
+    <span class="tag">{{ job.job_type }}</span>
 </div>
 
 <ul class="item-list">
@@ -15,17 +18,22 @@
     <li class="box">
         <div class="item-top">
             <div>
-                <strong>{{ application.applicant.username }}</strong>
+                <strong style="font-size: 1.05em;">{{ application.applicant.username }}</strong>
                 {% if application.applicant.email %}
                     <span class="meta">({{ application.applicant.email }})</span>
                 {% endif %}
                 <div class="meta">Applied on {{ application.applied_at|date:"M d, Y" }}</div>
             </div>
-            <span class="tag">{{ application.status }}</span>
+            <span class="tag {% if application.status == 'Accepted' %}tag-accepted{% elif application.status == 'Rejected' %}tag-rejected{% elif application.status == 'Reviewed' %}tag-reviewed{% endif %}">{{ application.status }}</span>
         </div>
-        <p style="margin: 8px 0 12px 0;">{{ application.cover_letter|linebreaksbr }}</p>
+        <p style="margin: 10px 0 14px 0; color: #334155;">{{ application.cover_letter|linebreaksbr }}</p>
+        {% if application.cv %}
+        <p style="margin: 0 0 14px 0;">
+            <a href="{{ application.cv.url }}" target="_blank" class="btn-secondary btn-small">View / Download CV</a>
+        </p>
+        {% endif %}
 
-        <form method="post" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <form method="post" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid #f1f5f9;">
             {% csrf_token %}
             <input type="hidden" name="application_id" value="{{ application.pk }}">
             <label for="id_status_{{ application.pk }}" style="margin: 0;">Update Status:</label>

@@ -3,21 +3,102 @@
 {% block title %}{% if job %}Edit Job{% else %}Post a Job{% endif %} - Internship Hub{% endblock %}
 
 {% block content %}
-<div class="box form-box">
-    <h2 style="margin-top: 0;">{% if job %}Edit Job Listing{% else %}Post a New Job or Internship{% endif %}</h2>
+<p style="margin-top: 0;">
+    {% if job %}
+        <a href="{% url 'job_detail' job.pk %}" style="text-decoration: none; font-weight: 500;">&larr; Back to Job Details</a>
+    {% else %}
+        <a href="{% url 'job_list' %}" style="text-decoration: none; font-weight: 500;">&larr; Back to Job Listings</a>
+    {% endif %}
+</p>
+
+<div class="box form-box-wide">
+    <h2 style="margin: 0 0 4px 0;">{% if job %}Edit Job Listing{% else %}Post a New Job or Internship{% endif %}</h2>
+    <p class="meta" style="margin: 0 0 18px 0;">
+        {% if job %}
+            Update role details, compensation, or deadlines for this listing.
+        {% else %}
+            Share an internship, part-time, or graduate role with campus applicants.
+        {% endif %}
+    </p>
 
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">{% if job %}Save Changes{% else %}Post Job{% endif %}</button>
-    </form>
 
-    <p style="margin: 16px 0 0 0;">
-        {% if job %}
-            <a href="{% url 'job_detail' job.pk %}">Cancel</a>
-        {% else %}
-            <a href="{% url 'job_list' %}">Cancel</a>
+        {% if form.non_field_errors %}
+            <ul class="errorlist">{{ form.non_field_errors }}</ul>
         {% endif %}
-    </p>
+
+        <div class="form-section-title" style="margin-top: 4px;">Role Overview</div>
+
+        <div class="form-field">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
+                {{ form.company }}
+                {{ form.company.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+                {{ form.location }}
+                {{ form.location.errors }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="{{ form.job_type.id_for_label }}">{{ form.job_type.label }}</label>
+                {{ form.job_type }}
+                {{ form.job_type.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.work_mode.id_for_label }}">{{ form.work_mode.label }}</label>
+                {{ form.work_mode }}
+                {{ form.work_mode.errors }}
+            </div>
+        </div>
+
+        <div class="form-section-title">Compensation &amp; Timeline</div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="{{ form.salary.id_for_label }}">{{ form.salary.label }}</label>
+                {{ form.salary }}
+                {{ form.salary.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.application_deadline.id_for_label }}">{{ form.application_deadline.label }}</label>
+                {{ form.application_deadline }}
+                {{ form.application_deadline.errors }}
+            </div>
+        </div>
+
+        <div class="form-section-title">Job Details</div>
+
+        <div class="form-field">
+            <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+
+        <div class="form-field">
+            <label for="{{ form.requirements.id_for_label }}">{{ form.requirements.label }}</label>
+            {{ form.requirements }}
+            {{ form.requirements.errors }}
+        </div>
+
+        <div class="actions" style="margin-top: 20px;">
+            <button type="submit">{% if job %}Save Changes{% else %}Publish Job Listing{% endif %}</button>
+            {% if job %}
+                <a href="{% url 'job_detail' job.pk %}" class="btn-secondary">Cancel</a>
+            {% else %}
+                <a href="{% url 'job_list' %}" class="btn-secondary">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
 </div>
 {% endblock %}

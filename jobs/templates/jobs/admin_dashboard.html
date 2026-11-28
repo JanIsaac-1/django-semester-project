@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Admin Dashboard</h2>
+        <p class="meta" style="margin: 2px 0 0 0;">Site-wide overview of job listings, incoming applications, and registered accounts.</p>
+    </div>
+    <div class="actions" style="margin-top: 0;">
+        <a href="{% url 'job_create' %}" class="btn btn-small">+ Post a Job</a>
+        <a href="/admin/" class="btn-secondary btn-small">Django Admin &rarr;</a>
+    </div>
+</div>
+
+<div class="detail-meta-grid" style="margin-bottom: 26px;">
+    <a href="#jobs-section" style="text-decoration: none; color: inherit;">
+        <span class="detail-meta-label">Open Jobs</span>
+        <span class="stat-number" style="font-size: 1.5em; margin: 2px 0 0 0;">{{ open_jobs_count }}</span>
+        <span class="meta" style="margin: 0; font-size: 0.8em;">{{ closed_jobs_count }} closed</span>
+    </a>
+    <a href="#applications-section" style="text-decoration: none; color: inherit;">
+        <span class="detail-meta-label">Total Applications</span>
+        <span class="stat-number" style="font-size: 1.5em; margin: 2px 0 0 0;">{{ total_applications }}</span>
+        <span class="meta" style="margin: 0; font-size: 0.8em;">{{ pending_applications_count }} pending review</span>
+    </a>
+    <a href="#users-section" style="text-decoration: none; color: inherit;">
+        <span class="detail-meta-label">Registered Users</span>
+        <span class="stat-number" style="font-size: 1.5em; margin: 2px 0 0 0;">{{ total_users }}</span>
+        <span class="meta" style="margin: 0; font-size: 0.8em;">Admins &amp; members</span>
+    </a>
+    <div>
+        <span class="detail-meta-label">Quick Jump</span>
+        <div style="margin-top: 6px; font-size: 0.88em; display: flex; flex-direction: column; gap: 2px;">
+            <a href="#jobs-section" style="text-decoration: none;">Manage Jobs &darr;</a>
+            <a href="#applications-section" style="text-decoration: none;">Review Applications &darr;</a>
+        </div>
+    </div>
+</div>
+
+<section id="jobs-section" class="box" style="padding: 20px 24px;">
+    <div class="page-header" style="margin-bottom: 12px;">
+        <h3>All Job Listings</h3>
+        <span class="meta" style="margin: 0;">{{ all_jobs|length }} total</span>
+    </div>
+
+    {% if all_jobs %}
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Posted By</th>
+                    <th>Applicants</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in all_jobs %}
+                <tr>
+                    <td>
+                        <strong><a href="{% url 'job_detail' job.pk %}" style="text-decoration: none;">{{ job.title }}</a></strong>
+                        <div class="meta" style="margin: 2px 0 0 0;">{{ job.company }} &bull; {{ job.location }} ({{ job.work_mode|default:"On-site" }})</div>
+                    </td>
+                    <td>{{ job.posted_by.username }}</td>
+                    <td>
+                        <a href="{% url 'job_applicants' job.pk %}" style="text-decoration: none; font-weight: 600;">
+                            {{ job.application_count }} Applicant{{ job.application_count|pluralize }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if job.is_active %}
+                            <span class="tag tag-accepted">Open</span>
+                        {% else %}
+                            <span class="tag tag-rejected">Closed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="actions" style="margin-top: 0;">
+                            <a href="{% url 'job_update' job.pk %}" class="btn-secondary btn-small">Edit</a>
+                            <form method="post" action="{% url 'toggle_job_status' job.pk %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                                {% if job.is_active %}
+                                    <button type="submit" class="btn-secondary btn-small" style="background: #fff; color: #0f766e; border: 1px solid #cbd5e1;">Close</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-small">Reopen</button>
+                                {% endif %}
+                            </form>
+                            <a href="{% url 'job_delete' job.pk %}" class="btn-danger btn-small">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="meta" style="margin: 0;">No job listings found.</p>
+    {% endif %}
+</section>
+
+<section id="applications-section" class="box" style="padding: 20px 24px;">
+    <div class="page-header" style="margin-bottom: 12px;">
+        <h3>Recent Applications</h3>
+        <span class="meta" style="margin: 0;">Latest 20 submissions</span>
+    </div>
+
+    {% if application_rows %}
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Applicant</th>
+                    <th>Job</th>
+                    <th>CV</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application, status_form in application_rows %}
+                <tr>
+                    <td>
+                        <strong>{{ application.applicant.username }}</strong>
+                        {% if application.applicant.email %}
+                            <div class="meta" style="margin: 2px 0 0 0;">{{ application.applicant.email }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'job_detail' application.job.pk %}" style="text-decoration: none; font-weight: 600;">{{ application.job.title }}</a>
+                        <div class="meta" style="margin: 2px 0 0 0;">{{ application.job.company }} &bull; {{ application.applied_at|date:"M d, Y" }}</div>
+                    </td>
+                    <td>
+                        {% if application.cv %}
+                            <a href="{{ application.cv.url }}" target="_blank" class="btn-secondary btn-small">View CV</a>
+                        {% else %}
+                            <span class="meta">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="tag {% if application.status == 'Accepted' %}tag-accepted{% elif application.status == 'Rejected' %}tag-rejected{% elif application.status == 'Reviewed' %}tag-reviewed{% endif %}">{{ application.status }}</span>
+                    </td>
+                    <td>
+                        <form method="post" style="display: flex; align-items: center; gap: 6px; margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="application_id" value="{{ application.pk }}">
+                            <select name="status" aria-label="Status for {{ application.applicant.username }}" style="width: auto; padding: 5px 8px; font-size: 13px;">
+                                {% for value, label in status_form.fields.status.choices %}
+                                    <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn-small">Save</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="meta" style="margin: 0;">No applications submitted yet.</p>
+    {% endif %}
+</section>
+
+<section id="users-section" class="box" style="padding: 20px 24px; margin-bottom: 0;">
+    <div class="page-header" style="margin-bottom: 12px;">
+        <h3>Registered Users</h3>
+        <span class="meta" style="margin: 0;">{{ total_users }} user{{ total_users|pluralize }}</span>
+    </div>
+
+    <div class="table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Activity</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in users %}
+                <tr>
+                    <td><strong>{{ account.username }}</strong></td>
+                    <td>{{ account.email|default:"—" }}</td>
+                    <td>
+                        {% if account.is_staff %}
+                            <span class="tag">Admin</span>
+                        {% else %}
+                            <span class="tag tag-fulltime">Member</span>
+                        {% endif %}
+                    </td>
+                    <td class="meta" style="margin: 0;">
+                        {{ account.posted_count }} job{{ account.posted_count|pluralize }} &bull; {{ account.app_count }} application{{ account.app_count|pluralize }}
+                    </td>
+                    <td class="meta" style="margin: 0;">{{ account.date_joined|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
