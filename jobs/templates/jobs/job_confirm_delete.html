@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Job - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="box form-box">
+    <h2 style="margin-top: 0;">Delete Job Listing</h2>
+    <p>Are you sure you want to delete <strong>{{ job.title }}</strong> at <strong>{{ job.company }}</strong>? This will also remove all associated applications.</p>
+
+    <form method="post" class="actions">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger-solid">Yes, Delete</button>
+        <a href="{% url 'job_detail' job.pk %}" class="btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

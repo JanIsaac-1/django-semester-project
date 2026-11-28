@@ -59,12 +59,12 @@
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 14px;
         }
         nav a {
             color: #475569;
             text-decoration: none;
-            font-size: 0.95em;
+            font-size: 0.92em;
             font-weight: 500;
         }
         nav a:hover {
@@ -83,14 +83,14 @@
         }
         .user-info {
             color: #64748b;
-            font-size: 0.9em;
+            font-size: 0.88em;
         }
         .logout-btn {
             background: none;
             border: none;
             color: #475569;
             font: inherit;
-            font-size: 0.95em;
+            font-size: 0.92em;
             font-weight: 500;
             cursor: pointer;
             padding: 0;
@@ -147,6 +147,13 @@
             font-size: 0.9em;
             margin: 4px 0 10px 0;
         }
+        .actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
         .btn {
             display: inline-block;
             padding: 8px 16px;
@@ -156,6 +163,8 @@
             border-radius: 5px;
             font-size: 14px;
             font-weight: 500;
+            border: none;
+            cursor: pointer;
         }
         .btn:hover {
             background-color: #115e59;
@@ -175,6 +184,63 @@
         .btn-secondary:hover {
             background-color: #f0fdfa;
             color: #115e59;
+        }
+        .btn-danger {
+            display: inline-block;
+            padding: 7px 15px;
+            background-color: #ffffff;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-danger:hover {
+            background-color: #fef2f2;
+            color: #991b1b;
+        }
+        .btn-danger-solid {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #b91c1c;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-danger-solid:hover {
+            background-color: #991b1b;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 13px;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .filter-bar input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-bar select {
+            width: auto;
+            min-width: 150px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 0.92em;
+            color: #64748b;
         }
         .messages {
             list-style: none;
@@ -215,7 +281,7 @@
             outline: none;
             border-color: #0f766e;
         }
-        main button[type="submit"] {
+        main button[type="submit"]:not(.btn-danger):not(.btn-danger-solid) {
             padding: 9px 18px;
             background-color: #0f766e;
             color: #ffffff;
@@ -225,8 +291,12 @@
             font-size: 14px;
             font-weight: 500;
         }
-        main button[type="submit"]:hover {
+        main button[type="submit"]:not(.btn-danger):not(.btn-danger-solid):hover {
             background-color: #115e59;
+        }
+        main button[type="submit"].btn-small {
+            padding: 5px 12px;
+            font-size: 13px;
         }
         .helptext {
             display: block;
@@ -277,6 +347,7 @@
                 <a href="{% url 'home' %}">Home</a>
                 <a href="{% url 'job_list' %}">Jobs</a>
                 {% if user.is_authenticated %}
+                    <a href="{% url 'my_posted_jobs' %}">My Jobs</a>
                     <a href="{% url 'my_applications' %}">My Applications</a>
                     <a href="{% url 'job_create' %}" class="nav-cta">+ Post Job</a>
                     <span class="user-info">Hi, <strong>{{ user.username }}</strong></span>
@@ -310,7 +381,8 @@
             <p>Campus Career &amp; Internship Hub &bull; Django Semester Project</p>
             <p>
                 <a href="{% url 'home' %}">Home</a> &middot;
-                <a href="{% url 'job_list' %}">Jobs</a>
+                <a href="{% url 'job_list' %}">Jobs</a> &middot;
+                <a href="{% url 'api_job_list' %}">Jobs API</a>
                 {% if user.is_authenticated %}
                     &middot; <a href="{% url 'my_applications' %}">My Applications</a>
                 {% else %}

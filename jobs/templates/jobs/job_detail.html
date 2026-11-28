@@ -16,16 +16,31 @@
     <p class="meta">Posted by {{ job.posted_by.username }} on {{ job.created_at|date:"M d, Y" }}</p>
     <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;">
     <div>{{ job.description|linebreaks }}</div>
+
+    {% if is_owner %}
+    <div class="actions">
+        <a href="{% url 'job_applicants' job.pk %}" class="btn btn-small">View Applicants ({{ job.applications.count }})</a>
+        <a href="{% url 'job_update' job.pk %}" class="btn-secondary btn-small">Edit Job</a>
+        <a href="{% url 'job_delete' job.pk %}" class="btn-danger btn-small">Delete Job</a>
+    </div>
+    {% endif %}
 </div>
 
+{% if not is_owner %}
 <div class="box">
     <h3 style="margin-top: 0;">Apply for this Position</h3>
     {% if user.is_authenticated %}
         {% if existing_application %}
-            <p style="margin-bottom: 0;">
+            <p>
                 You applied for this job on {{ existing_application.applied_at|date:"M d, Y" }}.
                 Status: <span class="tag">{{ existing_application.status }}</span>
             </p>
+            {% if existing_application.status == 'Applied' %}
+            <form method="post" action="{% url 'withdraw_application' existing_application.pk %}" style="margin-top: 10px;">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger btn-small">Withdraw Application</button>
+            </form>
+            {% endif %}
         {% else %}
             <form method="post" action="{% url 'apply_job' job.pk %}" style="max-width: 520px;">
                 {% csrf_token %}
@@ -37,4 +52,5 @@
         <p style="margin-bottom: 0;"><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> or <a href="{% url 'register' %}">register</a> to apply for this position.</p>
     {% endif %}
 </div>
+{% endif %}
 {% endblock %}

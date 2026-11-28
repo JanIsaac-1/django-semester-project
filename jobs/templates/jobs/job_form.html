@@ -1,17 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Post a Job - Internship Hub{% endblock %}
+{% block title %}{% if job %}Edit Job{% else %}Post a Job{% endif %} - Internship Hub{% endblock %}
 
 {% block content %}
 <div class="box form-box">
-    <h2 style="margin-top: 0;">Post a New Job or Internship</h2>
+    <h2 style="margin-top: 0;">{% if job %}Edit Job Listing{% else %}Post a New Job or Internship{% endif %}</h2>
 
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Post Job</button>
+        <button type="submit">{% if job %}Save Changes{% else %}Post Job{% endif %}</button>
     </form>
 
-    <p style="margin: 16px 0 0 0;"><a href="{% url 'job_list' %}">Cancel</a></p>
+    <p style="margin: 16px 0 0 0;">
+        {% if job %}
+            <a href="{% url 'job_detail' job.pk %}">Cancel</a>
+        {% else %}
+            <a href="{% url 'job_list' %}">Cancel</a>
+        {% endif %}
+    </p>
 </div>
 {% endblock %}

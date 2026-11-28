@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}My Posted Jobs - Internship Hub{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>My Posted Jobs</h2>
+    <a href="{% url 'job_create' %}" class="btn">+ Post a New Job</a>
+</div>
+
+<ul class="item-list">
+    {% for job in jobs %}
+    <li class="box">
+        <div class="item-top">
+            <div>
+                <h3 style="margin: 0;"><a href="{% url 'job_detail' job.pk %}" style="text-decoration: none;">{{ job.title }}</a></h3>
+                <p class="meta" style="margin-bottom: 0;">
+                    <strong>{{ job.company }}</strong> &bull; {{ job.location }} &bull; Posted {{ job.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+            <span class="tag">{{ job.application_count }} Applicant{{ job.application_count|pluralize }}</span>
+        </div>
+        <div class="actions">
+            <a href="{% url 'job_applicants' job.pk %}" class="btn btn-small">Manage Applicants</a>
+            <a href="{% url 'job_update' job.pk %}" class="btn-secondary btn-small">Edit</a>
+            <a href="{% url 'job_delete' job.pk %}" class="btn-danger btn-small">Delete</a>
+        </div>
+    </li>
+    {% empty %}
+    <li class="box">You haven't posted any jobs yet. <a href="{% url 'job_create' %}">Post your first job</a>.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

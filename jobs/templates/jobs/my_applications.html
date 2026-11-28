@@ -13,12 +13,21 @@
         <div class="item-top">
             <div>
                 <strong><a href="{% url 'job_detail' application.job.pk %}" style="text-decoration: none;">{{ application.job.title }}</a></strong>
-                <div class="meta" style="margin-bottom: 0;">
+                <div class="meta" style="margin-bottom: 6px;">
                     {{ application.job.company }} &bull; Applied on {{ application.applied_at|date:"M d, Y" }}
                 </div>
+                <p style="margin: 0; font-size: 0.92em; color: #475569;">{{ application.cover_letter|truncatewords:25 }}</p>
             </div>
             <span class="tag">{{ application.status }}</span>
         </div>
+        {% if application.status == 'Applied' %}
+        <div class="actions">
+            <form method="post" action="{% url 'withdraw_application' application.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger btn-small">Withdraw</button>
+            </form>
+        </div>
+        {% endif %}
     </li>
     {% empty %}
     <li class="box">You have not applied to any jobs yet. <a href="{% url 'job_list' %}">Browse jobs</a>.</li>

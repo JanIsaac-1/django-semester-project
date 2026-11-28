@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Applicants for {{ job.title }} - Internship Hub{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'my_posted_jobs' %}" style="text-decoration: none;">&larr; Back to My Posted Jobs</a></p>
+
+<div class="page-header">
+    <h2>Applicants for {{ job.title }}</h2>
+    <span class="tag">{{ job.company }}</span>
+</div>
+
+<ul class="item-list">
+    {% for application, status_form in application_rows %}
+    <li class="box">
+        <div class="item-top">
+            <div>
+                <strong>{{ application.applicant.username }}</strong>
+                {% if application.applicant.email %}
+                    <span class="meta">({{ application.applicant.email }})</span>
+                {% endif %}
+                <div class="meta">Applied on {{ application.applied_at|date:"M d, Y" }}</div>
+            </div>
+            <span class="tag">{{ application.status }}</span>
+        </div>
+        <p style="margin: 8px 0 12px 0;">{{ application.cover_letter|linebreaksbr }}</p>
+
+        <form method="post" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            {% csrf_token %}
+            <input type="hidden" name="application_id" value="{{ application.pk }}">
+            <label for="id_status_{{ application.pk }}" style="margin: 0;">Update Status:</label>
+            <select name="status" id="id_status_{{ application.pk }}" style="width: auto;">
+                {% for value, label in status_form.fields.status.choices %}
+                    <option value="{{ value }}" {% if application.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-small">Save Status</button>
+        </form>
+    </li>
+    {% empty %}
+    <li class="box">No applications received for this job yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -22,7 +22,7 @@ class UserRegisterForm(UserCreationForm):
 
 
 class JobForm(forms.ModelForm):
-    """Form for creating a new job or internship listing."""
+    """Form for creating or updating a job or internship listing."""
 
     class Meta:
         model = Job
@@ -38,3 +38,11 @@ class ApplicationForm(forms.ModelForm):
         widgets = {
             'cover_letter': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write a brief cover letter...'}),
         }
+
+
+class ApplicationStatusForm(forms.ModelForm):
+    """Form for job owners to update an application's review status."""
+
+    class Meta:
+        model = Application
+        fields = ['status']
